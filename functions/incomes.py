@@ -67,7 +67,7 @@ async def create_income(form, cur_user, db):
 
 
 
-    new_income_db = Incomes(
+    new_income_db =  Incomes(
         money=form.money,
         type=form.type,
         currency=form.currency,
