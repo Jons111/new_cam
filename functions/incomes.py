@@ -1,6 +1,7 @@
 import datetime
 
 from fastapi import HTTPException
+from sqlalchemy.orm import joinedload
 
 from functions.customers import one_customer, sub_customer_debt
 from functions.debts import one_debt
@@ -43,7 +44,7 @@ def all_incomes(search, status, trade_id, customer_id, user, start_date, end_dat
     except Exception:
         raise HTTPException(status_code=400, detail="Faqat yyyy-mmm-dd formatida yozing  ")
 
-    incomes = db.query(Incomes).filter(Incomes.date > start_date).filter(
+    incomes = db.query(Incomes ).filter(Incomes.date > start_date).filter(
         Incomes.date <= end_date).filter(search_filter, customer_id_filter, status_filter, user_filter,
                                          trade_id_filter).order_by(
         Incomes.id.desc())
@@ -55,15 +56,14 @@ def all_incomes(search, status, trade_id, customer_id, user, start_date, end_dat
 
 
 def one_income(id, db):
-    return db.query(Incomes).filter(Incomes.id == id).first()
+    return db.query(Incomes).options(
+        joinedload(Incomes.trade),joinedload(Incomes.customer)).filter(Incomes.id == id).first()
 
 
 async def create_income(form, cur_user, db):
     if one_user(cur_user.id, db) is None:
         raise HTTPException(status_code=400, detail="Bunday id raqamli foydalanuvchi mavjud emas")
 
-    if one_customer(form.customer_id, db) is None:
-        raise HTTPException(status_code=400, detail="Bunday id raqamli savdo mavjud emas")
 
 
 

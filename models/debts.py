@@ -17,4 +17,6 @@ class Debts(Base):
     status = Column(Boolean, default=True)
     debt_status = Column(Boolean, default=True, nullable=True, )
 
+    customer = relationship("Customers", back_populates="debt")
+    trade = relationship("Trades", back_populates="debt")
 

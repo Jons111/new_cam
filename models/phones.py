@@ -13,6 +13,7 @@ class Phones(Base):
     date = Column(DateTime(timezone=True), default=func.now(), nullable=False)
     status = Column(Boolean, nullable=False, default=True)
 
+    customer = relationship("Customers", back_populates="phone")
 
    
 

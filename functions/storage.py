@@ -1,6 +1,7 @@
 import datetime
 
 from fastapi import HTTPException
+from sqlalchemy.orm import joinedload
 
 from functions.customers import one_customer 
 
@@ -38,7 +39,8 @@ def all_storage(search, status, zapchast_id, user, start_date, end_date, page, l
     except Exception:
         raise HTTPException(status_code=400, detail="Faqat yyyy-mmm-dd formatida yozing  ")
 
-    storage = db.query(Storage).filter(Storage.date >= start_date).filter(
+    storage = db.query(Storage).options(
+        joinedload(Storage.zapchast) ).filter(Storage.date >= start_date).filter(
         Storage.date <= end_date).filter(search_filter, zapchast_id_filter, status_filter, user_filter,
                                         ).order_by(
         Storage.id.desc())
@@ -50,7 +52,8 @@ def all_storage(search, status, zapchast_id, user, start_date, end_date, page, l
 
 
 def one_storage(id, db):
-    return db.query(Storage).filter(Storage.id == id).first()
+    return db.query(Storage).options(
+        joinedload(Storage.zapchast) ).filter(Storage.id == id).first()
 
 
 async def create_storage(form, cur_user, db):

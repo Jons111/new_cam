@@ -1,6 +1,7 @@
 import datetime
 
 from fastapi import HTTPException
+from sqlalchemy.orm import joinedload
 
 from functions.customers import one_customer
 from functions.trades import one_trade
@@ -39,7 +40,8 @@ def all_debts(search, status, debt_status, customer_id, user, page, limit, db):
     else:
         user_filter = Debts.user_id > 0
 
-    debts = db.query(Debts).filter(
+    debts = db.query(Debts).options(
+        joinedload(Debts.trade),joinedload(Debts.customer) ).filter(
         search_filter,
         status_filter,
         order_filter,
@@ -54,7 +56,8 @@ def all_debts(search, status, debt_status, customer_id, user, page, limit, db):
 
 
 def one_debt(id, db):
-    return db.query(Debts).filter(
+    return db.query(Debts).options(
+        joinedload(Debts.trade),joinedload(Debts.customer) ).filter(
         Debts.id == id).order_by(Debts.id.desc()).first()
 
 

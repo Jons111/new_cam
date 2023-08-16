@@ -1,6 +1,7 @@
 import datetime
 
 from fastapi import HTTPException
+from sqlalchemy.orm import joinedload
 
 from functions.type import one_type
 
@@ -23,9 +24,9 @@ def all_products(search, status, type_id, user, start_date, end_date, page, limi
         status_filter = Products.status.in_([True, False])
 
     if type_id:
-        type_id_filter = Products.type == type_id
+        type_id_filter = Products.type_id == type_id
     else:
-        type_id_filter = Products.type > 0
+        type_id_filter = Products.type_id > 0
 
     if user:
         user_filter = Products.user_id == user.id
@@ -38,7 +39,8 @@ def all_products(search, status, type_id, user, start_date, end_date, page, limi
     except Exception:
         raise HTTPException(status_code=400, detail="Faqat yyyy-mmm-dd formatida yozing  ")
 
-    products = db.query(Products).filter(Products.date >= start_date).filter(
+    products = db.query(Products).options(
+        joinedload(Products.type)).filter(Products.date >= start_date).filter(
         Products.date <= end_date).filter(search_filter, type_id_filter, status_filter, user_filter,
                                         ).order_by(
         Products.id.desc())
@@ -50,7 +52,8 @@ def all_products(search, status, type_id, user, start_date, end_date, page, limi
 
 
 def one_product(id, db):
-    return db.query(Products).filter(Products.id == id).first()
+    return db.query(Products).options(
+        joinedload(Products.type)).filter(Products.id == id).first()
 
 
 async def create_product(form, cur_user, db):
@@ -62,7 +65,7 @@ async def create_product(form, cur_user, db):
 
     new_product_db = Products(
         name=form.name,
-        type=form.type_id,
+        type_id=form.type_id,
         price=form.price,
         currency=form.currency,
         user_id=cur_user.id, )

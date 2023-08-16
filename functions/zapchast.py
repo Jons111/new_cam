@@ -1,6 +1,7 @@
 import datetime
 
 from fastapi import HTTPException
+from sqlalchemy.orm import joinedload
 
 from functions.type import one_type
 
@@ -38,7 +39,8 @@ def all_zapchast(search, status, type_id, user, start_date, end_date, page, limi
     except Exception:
         raise HTTPException(status_code=400, detail="Faqat yyyy-mmm-dd formatida yozing  ")
 
-    zapchast = db.query(Zapchasts).filter(Zapchasts.date > start_date).filter(
+    zapchast = db.query(Zapchasts).options(
+        joinedload(Zapchasts.type), ).filter(Zapchasts.date > start_date).filter(
         Zapchasts.date <= end_date).filter(search_filter, type_id_filter, status_filter, user_filter,
                                         ).order_by(
         Zapchasts.id.desc())
@@ -50,7 +52,8 @@ def all_zapchast(search, status, type_id, user, start_date, end_date, page, limi
 
 
 def one_zapchast(id, db):
-    return db.query(Zapchasts).filter(Zapchasts.id == id).first()
+    return db.query(Zapchasts).options(
+        joinedload(Zapchasts.type), ).filter(Zapchasts.id == id).first()
 
 
 async def create_zapchast(form, cur_user, db):

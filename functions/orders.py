@@ -1,6 +1,7 @@
 import datetime
 
 from fastapi import HTTPException
+from sqlalchemy.orm import joinedload
 
 from functions.customers import one_customer, sub_customer_debt
 
@@ -38,7 +39,8 @@ def all_orders(search, status, customer_id, user, start_date, end_date, page, li
     except Exception:
         raise HTTPException(status_code=400, detail="Faqat yyyy-mmm-dd formatida yozing  ")
 
-    orders = db.query(Orders).filter(Orders.date > start_date).filter(
+    orders = db.query(Orders).options(
+        joinedload(Orders.trade),joinedload(Orders.customer)).filter(Orders.date > start_date).filter(
         Orders.date <= end_date).filter(search_filter, customer_id_filter, status_filter, user_filter,
                                         ).order_by(
         Orders.id.desc())
@@ -50,7 +52,8 @@ def all_orders(search, status, customer_id, user, start_date, end_date, page, li
 
 
 def one_order(id, db):
-    return db.query(Orders).filter(Orders.id == id).first()
+    return db.query(Orders).options(
+        joinedload(Orders.trade),joinedload(Orders.customer)).filter(Orders.id == id).first()
 
 
 async def create_order(form, cur_user, db):

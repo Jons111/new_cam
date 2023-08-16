@@ -19,5 +19,6 @@ class Storage(Base):
     status = Column(Boolean, nullable=False, default=True)
 
 
+    zapchast = relationship("Zapchasts", back_populates="storage")
 
 

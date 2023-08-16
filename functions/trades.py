@@ -37,7 +37,8 @@ def all_trades(search, status,order_id,   start_date, end_date,user, page, limit
     except Exception as error:
         raise HTTPException(status_code=400, detail="Faqat yyyy-mmm-dd formatida yozing  ")
 
-    trades = db.query(Trades).filter(Trades.date > start_date).filter(
+    trades = db.query(Trades).options(
+        joinedload(Trades.zapchast),joinedload(Trades.order),joinedload(Trades.debt),joinedload(Trades.income), ).filter(Trades.date > start_date).filter(
         Trades.date <= end_date).filter(search_filter, status_filter,trade_id_filter,user_filter  ).order_by(
         Trades.id.desc())
     if page and limit:
@@ -48,7 +49,8 @@ def all_trades(search, status,order_id,   start_date, end_date,user, page, limit
 
 
 def one_trade(id, db):
-    return db.query(Trades).filter(Trades.id == id).first()
+    return db.query(Trades).options(
+        joinedload(Trades.zapchast),joinedload(Trades.order),joinedload(Trades.debt),joinedload(Trades.income), ).filter(Trades.id == id).first()
 
 
 async def create_trade(form, cur_user, db):

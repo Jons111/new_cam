@@ -21,3 +21,4 @@ class Users(Base):
     password = Column(String(200), nullable=True)
     status = Column(Boolean, nullable=True, default=True)
     token = Column(String(400), default='', nullable=True)
+

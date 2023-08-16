@@ -26,3 +26,9 @@ class Orders(Base):
     payment_summ = Column(Float, nullable=True, default=0)
 
 
+    customer = relationship("Customers", back_populates="order")
+    trade = relationship("Trades", back_populates="order")
+
+
+
+

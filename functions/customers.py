@@ -30,7 +30,8 @@ def all_customers(search, status, user, page, limit, db):
     else:
         user_id_filter = Customers.id > 0
 
-    customers = db.query(Customers).join(Phones).filter(search_filter,
+    customers = db.query(Customers).join(Phones).options(
+        joinedload(Customers.phone),joinedload(Customers.debt),joinedload(Customers.order),).filter(search_filter,
                                                         status_filter,
                                                         user_id_filter,
                                                         ).order_by(Customers.id.desc())
@@ -42,7 +43,8 @@ def all_customers(search, status, user, page, limit, db):
 
 
 def one_customer(id, db):
-    return db.query(Customers).filter(Customers.id == id).first()
+    return db.query(Customers).join(Phones).options(
+        joinedload(Customers.phone),joinedload(Customers.debt),joinedload(Customers.order),).filter(Customers.id == id).first()
 
 
 def create_customer(form, user, db):

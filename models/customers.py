@@ -15,3 +15,9 @@ class Customers(Base):
     date = Column(DateTime(timezone=True), default=func.now(), nullable=False)
     status = Column(Boolean, nullable=False, default=True)
 
+    phone = relationship("Phones", back_populates="customer")
+    debt= relationship("Debts", back_populates="customer")
+    order= relationship("Orders", back_populates="customer")
+    income= relationship("Incomes", back_populates="customer")
+
+

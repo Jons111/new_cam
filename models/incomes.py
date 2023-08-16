@@ -18,7 +18,6 @@ class Incomes(Base):
     date = Column(DateTime(timezone=True), default=func.now(), nullable=False)
     status = Column(Boolean, nullable=False, default=True)
 
-
-
-
+    customer = relationship("Customers", back_populates="income")
+    trade = relationship("Trades", back_populates="income")
 
