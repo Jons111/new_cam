@@ -8,11 +8,11 @@ from db import Base, engine
 
 Base.metadata.create_all(bind=engine)
 
-import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+
 
 app = FastAPI(
-    title="Savdo market",
+    title="Cam",
     responses={200: {'description': 'Ok'}, 201: {'description': 'Created'}, 400: {'description': 'Bad Request'},
                401: {'desription': 'Unauthorized'}}
 )
