@@ -16,6 +16,7 @@ class Zapchasts(Base):
     date = Column(DateTime(timezone=True), default=func.now(), nullable=False)
     status = Column(Boolean, nullable=False, default=True)
 
+
     type = relationship("Types", back_populates="zapchast")
     trade = relationship("Trades", back_populates="zapchast")
     storage = relationship("Storage", back_populates="zapchast")

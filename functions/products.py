@@ -3,9 +3,11 @@ import datetime
 from fastapi import HTTPException
 from sqlalchemy.orm import joinedload
 
+from functions.storage import update_storage_number
 from functions.type import one_type
 
 from functions.users import one_user
+from functions.zapchast import create_zapchast
 
 from models.products import Products
 
@@ -42,7 +44,7 @@ def all_products(search, status, type_id, user, start_date, end_date, page, limi
     products = db.query(Products).options(
         joinedload(Products.type)).filter(Products.date >= start_date).filter(
         Products.date <= end_date).filter(search_filter, type_id_filter, status_filter, user_filter,
-                                        ).order_by(
+                                          ).order_by(
         Products.id.desc())
     if page and limit:
         return pagination(products, page, limit)
@@ -72,6 +74,11 @@ async def create_product(form, cur_user, db):
     db.add(new_product_db)
     db.commit()
     db.refresh(new_product_db)
+    for zapchast in form.zapchast:
+        print(zapchast.number,'lllllllllllllllllllllllllllllll')
+        print(type(zapchast),'lllllllllllllllllllllllllllllll')
+        if zapchast.zapchast_status:
+            update_storage_number(zapchast_form=form,  cur_user=cur_user, db=db)
 
     return new_product_db
 
@@ -83,7 +90,7 @@ def update_product(form, cur_user, db):
     if one_user(cur_user.id, db) is None:
         raise HTTPException(status_code=400, detail="Bunday id raqamli user mavjud emas")
 
-    db.query(Products).filter(Products.id == form.id).update({         
+    db.query(Products).filter(Products.id == form.id).update({
         Products.name: form.name,
         Products.type: form.type,
         Products.price: form.price,

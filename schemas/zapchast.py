@@ -11,6 +11,7 @@ class ZapchastBase(BaseModel):
 
 
 
+
 class ZapchastCreate(ZapchastBase):
     pass
 
@@ -18,3 +19,12 @@ class ZapchastCreate(ZapchastBase):
 class ZapchastUpdate(ZapchastBase):
     id: int
     status: bool
+
+class ZapchastBaseList(BaseModel):
+    id:int
+    name: str
+    birlik: str
+    type_id: int
+    size: str
+    number: float
+    zapchast_status:bool = True

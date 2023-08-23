@@ -3,7 +3,7 @@ import datetime
 from fastapi import HTTPException
 from sqlalchemy.orm import joinedload
 
-from functions.customers import one_customer 
+from functions.customers import one_customer
 
 from functions.users import one_user
 
@@ -40,9 +40,9 @@ def all_storage(search, status, zapchast_id, user, start_date, end_date, page, l
         raise HTTPException(status_code=400, detail="Faqat yyyy-mmm-dd formatida yozing  ")
 
     storage = db.query(Storage).options(
-        joinedload(Storage.zapchast) ).filter(Storage.date >= start_date).filter(
+        joinedload(Storage.zapchast)).filter(Storage.date >= start_date).filter(
         Storage.date <= end_date).filter(search_filter, zapchast_id_filter, status_filter, user_filter,
-                                        ).order_by(
+                                         ).order_by(
         Storage.id.desc())
     if page and limit:
         return pagination(storage, page, limit)
@@ -53,7 +53,7 @@ def all_storage(search, status, zapchast_id, user, start_date, end_date, page, l
 
 def one_storage(id, db):
     return db.query(Storage).options(
-        joinedload(Storage.zapchast) ).filter(Storage.id == id).first()
+        joinedload(Storage.zapchast)).filter(Storage.id == id).first()
 
 
 async def create_storage(form, cur_user, db):
@@ -84,7 +84,7 @@ def update_storage(form, cur_user, db):
     if one_user(cur_user.id, db) is None:
         raise HTTPException(status_code=400, detail="Bunday id raqamli user mavjud emas")
 
-    db.query(Storage).filter(Storage.id == form.id).update({         
+    db.query(Storage).filter(Storage.id == form.id).update({
         Storage.name: form.name,
         Storage.birlik: form.birlik,
         Storage.zapchast_id: form.zapchast_id,
@@ -97,3 +97,23 @@ def update_storage(form, cur_user, db):
     })
     db.commit()
     return one_storage(form.id, db)
+
+
+def update_storage_number(zapchast_form,cur_user, db):
+    zapchast = db.query(Storage).filter(Storage.zapchast_id == zapchast_form.id).first()
+    if zapchast:
+        zapchast_number = zapchast.number + zapchast_form.number
+        db.query(Storage).filter(Storage.zapchast_id == zapchast_form.id).update({
+            Storage.number: zapchast_number})
+        db.commit()
+    else:
+        new_storage_db = Storage(
+            name=zapchast_form.name,
+            birlik=zapchast_form.birlik,
+            size=zapchast_form.size,
+            number=zapchast_form.number,
+            zapchast_id=zapchast_form.zapchast_id,
+            user_id=cur_user.id, )
+        db.add(new_storage_db)
+        db.commit()
+        db.refresh(new_storage_db)
